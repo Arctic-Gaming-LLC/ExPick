@@ -1,6 +1,6 @@
 #==================#
 #    ExPickaxes    #
-#      v1.3.0      #
+#  ver GabeZillia  #
 #   ArcticRaven_   #
 #==================#
 
@@ -21,25 +21,38 @@ command ExPick <player=%player%>:
 	permission: expick.give
 	permission message: &7&l[&4&lExPick&7&l] &cYou do not have the required permission to perform this command
 	trigger:
-		give a diamond pickaxe with lore "&4Explosive" to arg-1	
+		give diamond pickaxe with lore "&6Explosive 3x3x3" to arg-1
+
+command ExpickToggle <text="false">:
+	usage: /expicktoggle <true or false>
+	permission: expick.toggle
+	permission message: &7&l[&4&lExPick&7&l] &cYou do not have the required permission to perform this command
+	trigger:
+		if arg-1 is "false":
+			set {enabled} to false
+			message "&7&l[&4&lExPick&7&l] is toggled off"
+		if arg-1 is "true":
+			set {enabled} to true
+			message "&7&l[&4&lExPick&7&l] is toggled on"
+
+on load:
+	set {blocks::*} to stone and andesite and diorite and granite and dirt and sandstone and netherrack and endstone and basalt and blackstone
 	
 on block break:
-	if player have permission "epickaxe.use":
-		if player is holding a diamond pickaxe with lore "&4Explosive":
+	if {enabled} is true:
+		if player is holding a diamond pickaxe with lore "&6Explosive 3x3x3":
 			loop blocks in radius 1.75 of event-block:
-				if loop-blocks are stone or cobblestone or diorite or granite or andesite or sandstone or stone bricks or netherrack or nether bricks or endstone:
+				if {blocks::*} contains loop-blocks:
 					break loop-blocks naturally using player's tool
 					add 1 to {uses.%player%}
-					if {@ExpickEffect} is true:
-						create a fake explosion at event-block
-				if event-block is not stone or cobblestone or diorite or granite or andesite or sandstone or stone bricks or netherrack or nether bricks or air:
+				if {blocks::*} does not contain loop-blocks:
 					cancel event
-				if {uses.%player%} is {@EpickNotif1}:
-					send action bar "&6Your Explosive Pickaxe will break soon!" to player
-				if {uses.%player%} is {@EpickNotif2}:
-					send action bar "&cYour Explosive Pickaxe will break very soon!" to player
-				if {uses.%player%} is {@EpickMaxHealth}:
-					set player's tool to air
-					set {uses.%player%} to 0
-					play sound "entity.item.break" with volume .75 to player
-					send action bar "&4Your Explosive Pickaxe has broken!" to player
+		if {uses.%player%} is {@EpickNotif1}:
+			send action bar "&6Your Explosive Pickaxe will break soon!" to player
+		if {uses.%player%} is {@EpickNotif2}:
+			send action bar "&cYour Explosive Pickaxe will break very soon!" to player
+		if {uses.%player%} is {@EpickMaxHealth}:
+			set player's tool to air
+			set {uses.%player%} to 0
+			play sound "entity.item.break" with volume .75 to player
+			send action bar "&4Your Explosive Pickaxe has broken!" to player
